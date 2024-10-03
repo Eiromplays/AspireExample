@@ -1,0 +1,16 @@
+﻿@inject TodoApiClient TodoApi
+@inject NavigationManager NavigationManager
+
+<button class="btn-danger rounded-1" @onclick="Delete">Delete</button>
+
+@functions {
+
+    [Parameter]
+    public TodoDto TodoDto { get; set; } = default!;
+
+    private async Task Delete()
+    {
+        await TodoApi.DeleteTodoAsync(TodoDto.Id);
+        NavigationManager.NavigateTo("/todos");
+    }
+}

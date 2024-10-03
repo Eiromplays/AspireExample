@@ -1,0 +1,48 @@
+﻿@inject TodoApiClient TodoApi
+@inject NavigationManager NavigationManager
+
+<form method="post" @onsubmit="Submit" @formname="create-todo-form">
+    <AntiforgeryToken />
+    <div class="flex-column">
+        <label>
+            Title:
+            <InputText @bind-Value="Model.Title" />
+        </label>
+        <label>
+            Description:
+            <InputText @bind-Value="Model.Description"/>
+        </label>
+        <label>
+            IsCompleted:
+            <InputCheckbox @bind-Value="Model.IsCompleted"/>
+        </label>
+        <label>
+            CreatedAt:
+            <InputDate TValue="DateTimeOffset" @bind-Value="Model.CreatedAt"/>
+        </label>
+        <label>
+            UpdatedAt:
+            <InputDate TValue="DateTimeOffset" @bind-Value="Model.UpdatedAt"/>
+        </label>
+    </div>
+    <div>
+        <button type="submit">Submit</button>
+    </div>
+</form>
+
+@code {
+
+    [SupplyParameterFromForm]
+    private TodoDto Model { get; set; } = new()
+    {
+        CreatedAt = DateTimeOffset.UtcNow,
+        UpdatedAt = DateTimeOffset.UtcNow,
+    };
+
+    private async Task Submit()
+    {
+        var todo = await TodoApi.CreateTodoAsync(Model);
+
+        NavigationManager.NavigateTo("/todos");
+    }
+}

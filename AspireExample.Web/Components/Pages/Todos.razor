@@ -1,0 +1,59 @@
+﻿@page "/todos"
+@using AspireExample.Web.Components.Todos
+@attribute [StreamRendering(true)]
+
+@inject TodoApiClient TodoApi
+
+<PageTitle>Todos</PageTitle>
+
+<h1>Todos</h1>
+
+<p>This component demonstrates showing data loaded from a backend API service.</p>
+
+@if (_todos is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>IsCompleted</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var todoDto in _todos)
+            {
+                <tr>
+                    <td><a href="/todos/@todoDto.Id">@todoDto.Id</a></td>
+                    <td>@todoDto.Title</td>
+                    <td>@todoDto.Description</td>
+                    <td>@todoDto.IsCompleted</td>
+                    <td>@todoDto.CreatedAt</td>
+                    <td>@todoDto.UpdatedAt</td>
+                    <td>
+                        <DeleteTodo TodoDto="@todoDto" @rendermode="InteractiveServer" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<CreateTodo />
+
+@code {
+    private TodoDto[]? _todos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _todos = await TodoApi.GetTodosAsync();
+    }
+}

@@ -1,0 +1,49 @@
+﻿@page "/Todos/{id:int}"
+@using AspireExample.Web.Components.Todos
+@attribute [StreamRendering(true)]
+
+@inject TodoApiClient TodoApi
+
+<PageTitle>Todo</PageTitle>
+
+<h1>Todo</h1>
+
+@if (TodoDto is null && !_notFound)
+{
+    <p><em>Loading...</em></p>
+}
+else if (_notFound)
+{
+    <p>Todo not found.</p>
+}
+else if (TodoDto is not null)
+{
+    <div class="card">
+        <h2>@TodoDto.Title</h2>
+        <p>@TodoDto.Description</p>
+        <p>@TodoDto.IsCompleted</p>
+        <p>@TodoDto.CreatedAt</p>
+        <p>@TodoDto.UpdatedAt</p>
+        <DeleteTodo TodoDto="@TodoDto" @rendermode="InteractiveServer" />
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private TodoDto? TodoDto { get; set; }
+    private bool _notFound = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            TodoDto = await TodoApi.GetTodoAsync(Id);
+        }
+        catch (HttpRequestException e) when(e.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            _notFound = true;
+        }
+    }
+}
